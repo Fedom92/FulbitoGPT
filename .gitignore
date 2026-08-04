@@ -41,5 +41,5 @@ firestore.rules
 *firebase-adminsdk*.json
 serviceAccountKey.json
 
-*.md
+skill.md
 .claude
