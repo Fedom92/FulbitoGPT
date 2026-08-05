@@ -5,6 +5,7 @@ import { useContainedSize } from '../hooks/useContainedSize.js';
 import { getFormation, createFormation } from '../services/formations.js';
 import { makePlayerId } from '../utils/id.js';
 import TopBar from '../components/TopBar.jsx';
+import Footer from '../components/Footer.jsx';
 import SoccerField from '../components/SoccerField.jsx';
 import Player from '../components/Player.jsx';
 import DeleteZone from '../components/DeleteZone.jsx';
@@ -159,6 +160,8 @@ function FormationBoard() {
           )}
         </div>
       </div>
+
+      <Footer />
 
       <AddPlayerButton onClick={() => setShowAddModal(true)} />
       <DeleteZone visible={armedPlayerId != null} />

@@ -1,81 +1,59 @@
-// One-off placeholder PWA icon generator. No npm dependencies — only Node built-ins.
-// Run manually: node scripts/generate-icons.mjs
-// Safe to delete once real branding art replaces these placeholders.
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { deflateSync, crc32 } from 'node:zlib';
+// Generates PWA/favicon icons and the social-preview image from the source
+// branding art in src/assets/. Run after logo.webp or logo_simple.webp change:
+//   node scripts/generate-icons.mjs
+import sharp from 'sharp';
+import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DIR = join(__dirname, '..', 'public');
+const ROOT = join(__dirname, '..');
+const ASSETS_DIR = join(ROOT, 'src', 'assets');
+const PUBLIC_DIR = join(ROOT, 'public');
 
-const PITCH_GREEN = [0x1b, 0x7a, 0x3b];
-const PLAYER_ORANGE = [0xf4, 0x80, 0x1e];
+const ICON_SOURCE = join(ASSETS_DIR, 'logo_simple.webp'); // icon-only mark, no wordmark
+const SOCIAL_SOURCE = join(ASSETS_DIR, 'logo.webp'); // full lockup with wordmark
+const BACKGROUND = { r: 0x0b, g: 0x27, b: 0x22 }; // sampled from the mark's own background
 
-function crc32Buffer(buf) {
-  return crc32(buf) >>> 0;
+mkdirSync(join(PUBLIC_DIR, 'icons'), { recursive: true });
+
+async function writeSquareIcon(destName, size) {
+  const dest = join(PUBLIC_DIR, 'icons', destName);
+  await sharp(ICON_SOURCE)
+    .resize(size, size, { fit: 'cover', kernel: sharp.kernel.lanczos3 })
+    .png({ compressionLevel: 9 })
+    .toFile(dest);
+  console.log(`wrote ${dest} (${size}x${size})`);
 }
 
-function chunk(type, data) {
-  const typeBuf = Buffer.from(type, 'ascii');
-  const lenBuf = Buffer.alloc(4);
-  lenBuf.writeUInt32BE(data.length, 0);
-  const crcInput = Buffer.concat([typeBuf, data]);
-  const crcBuf = Buffer.alloc(4);
-  crcBuf.writeUInt32BE(crc32Buffer(crcInput), 0);
-  return Buffer.concat([lenBuf, typeBuf, data, crcBuf]);
+async function writeMaskableIcon(destName, size) {
+  const dest = join(PUBLIC_DIR, 'icons', destName);
+  const safeZone = Math.round(size * 0.8); // keep artwork inside Android's adaptive-icon safe zone
+  const inner = await sharp(ICON_SOURCE)
+    .resize(safeZone, safeZone, { fit: 'cover', kernel: sharp.kernel.lanczos3 })
+    .toBuffer();
+  await sharp({
+    create: { width: size, height: size, channels: 3, background: BACKGROUND },
+  })
+    .composite([{ input: inner, gravity: 'centre' }])
+    .png({ compressionLevel: 9 })
+    .toFile(dest);
+  console.log(`wrote ${dest} (${size}x${size}, maskable safe zone)`);
 }
 
-function encodePng(width, height, pixelFn) {
-  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-
-  const ihdrData = Buffer.alloc(13);
-  ihdrData.writeUInt32BE(width, 0);
-  ihdrData.writeUInt32BE(height, 4);
-  ihdrData[8] = 8; // bit depth
-  ihdrData[9] = 2; // color type: truecolor RGB
-  ihdrData[10] = 0; // compression
-  ihdrData[11] = 0; // filter
-  ihdrData[12] = 0; // interlace
-  const ihdr = chunk('IHDR', ihdrData);
-
-  const raw = Buffer.alloc(height * (1 + width * 3));
-  let offset = 0;
-  for (let y = 0; y < height; y++) {
-    raw[offset++] = 0; // filter type: none
-    for (let x = 0; x < width; x++) {
-      const [r, g, b] = pixelFn(x, y);
-      raw[offset++] = r;
-      raw[offset++] = g;
-      raw[offset++] = b;
-    }
-  }
-  const idat = chunk('IDAT', deflateSync(raw));
-  const iend = chunk('IEND', Buffer.alloc(0));
-
-  return Buffer.concat([signature, ihdr, idat, iend]);
+async function writeSocialPreview() {
+  const dest = join(PUBLIC_DIR, 'social-preview.png');
+  const meta = await sharp(SOCIAL_SOURCE).metadata();
+  const size = Math.min(meta.width, 1200); // never upscale past the source
+  await sharp(SOCIAL_SOURCE)
+    .resize(size, size, { kernel: sharp.kernel.lanczos3 })
+    .png({ compressionLevel: 9 })
+    .toFile(dest);
+  console.log(`wrote ${dest} (${size}x${size})`);
 }
 
-function circlePixel(x, y, size, radiusRatio, opaqueBackground = true) {
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = size * radiusRatio;
-  const dx = x + 0.5 - cx;
-  const dy = y + 0.5 - cy;
-  if (dx * dx + dy * dy <= r * r) return PLAYER_ORANGE;
-  return opaqueBackground ? PITCH_GREEN : PITCH_GREEN;
-}
-
-function writeIcon(name, size, radiusRatio) {
-  const buf = encodePng(size, size, (x, y) => circlePixel(x, y, size, radiusRatio));
-  const path = join(PUBLIC_DIR, name);
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, buf);
-  console.log(`wrote ${path} (${size}x${size})`);
-}
-
-writeIcon('icons/icon-192.png', 192, 0.42);
-writeIcon('icons/icon-512.png', 512, 0.42);
-writeIcon('icons/icon-512-maskable.png', 512, 0.32); // extra padding for maskable safe zone
-writeIcon('icons/apple-touch-icon.png', 180, 0.42);
-writeIcon('favicon.png', 48, 0.42);
+await writeSquareIcon('icon-192.png', 192);
+await writeSquareIcon('icon-512.png', 512);
+await writeMaskableIcon('icon-512-maskable.png', 512);
+await writeSquareIcon('apple-touch-icon.png', 180);
+await writeSocialPreview();

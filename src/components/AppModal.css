@@ -59,6 +59,10 @@
   background: #fbe1e0;
 }
 
+.app-modal__icon--green {
+  background: #dcf1e3;
+}
+
 .app-modal__title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -188,6 +192,44 @@
   font-size: 0.82rem;
   color: #7a7a8c;
   margin: 0 0 8px;
+}
+
+/* Alias/code block with a trailing copy-to-clipboard button */
+
+.app-code-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f1f5;
+  border: 1.5px solid #e2e2ea;
+  border-radius: 12px;
+  padding: 0.5rem 0.5rem 0.5rem 0.9rem;
+}
+
+.app-code-row__text {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  color: #1a1a2e;
+  word-break: break-all;
+}
+
+.app-code-row__copy {
+  flex-shrink: 0;
+  border: none;
+  background: #fff;
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.app-code-row__copy:active {
+  transform: scale(0.95);
 }
 
 /* Selectable color cards (team picker) */

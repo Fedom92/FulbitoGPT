@@ -18,6 +18,18 @@
   text-overflow: ellipsis;
 }
 
+.top-bar__brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
 .top-bar__save {
   flex-shrink: 0;
+}
+
+.top-bar__author {
+  margin-left: 6px;
+  font-size: 0.85rem;
+  color: #adb5bd;      /* estilo muted */
+  font-weight: 400;
 }
