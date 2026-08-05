@@ -1,8 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import './TopBar.css';
-import logo from '../assets/logo_simple.webp';
 
-function TopBar({ onSave, saving, formationAuthor }) {
+function TopBar({ onSave, saving, canSave = true, formationAuthor }) {
   return (
         <div className="top-bar">
       <div className="top-bar__title">
@@ -16,7 +15,14 @@ function TopBar({ onSave, saving, formationAuthor }) {
           </span>
         )}
       </div>
-      <Button variant="light" className="top-bar__save" onClick={onSave} disabled={saving} aria-label="Guardar y compartir">
+      <Button
+        variant="light"
+        className="top-bar__save"
+        onClick={onSave}
+        disabled={saving || !canSave}
+        aria-label="Guardar y compartir"
+        title={canSave ? undefined : 'Agregá al menos un jugador para guardar'}
+      >
         💾 Guardar
       </Button>
     </div>

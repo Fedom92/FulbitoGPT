@@ -104,6 +104,7 @@ function FormationBoard() {
   };
 
   const handleSaveClick = () => {
+    if (state.players.length === 0) return;
     if (authorName) {
       performSave(authorName);
     } else {
@@ -122,6 +123,7 @@ function FormationBoard() {
       <TopBar
         onSave={handleSaveClick}
         saving={saveModal.show && saveModal.status === 'saving'}
+        canSave={state.players.length > 0}
         formationAuthor={loadedAuthorName}
       />
 
