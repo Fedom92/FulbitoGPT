@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import { buildWhatsAppLink, copyToClipboard, shareFormation } from '../utils/share.js';
+import logo_wsp from '../assets/whatsapp.webp';
 import './AppModal.css';
 
 function SaveShareModal({ show, onClose, status, link, error, onRetry }) {
@@ -63,9 +64,10 @@ function SaveShareModal({ show, onClose, status, link, error, onRetry }) {
                 href={buildWhatsAppLink(link)}
                 target="_blank"
                 rel="noreferrer"
-                className="app-btn"
+                className="app-btn d-flex align-items-center justify-content-center gap-2"
                 style={{ background: '#25D366', color: '#fff', textAlign: 'center', textDecoration: 'none' }}
               >
+                <img src={logo_wsp} alt="" className="app-modal__icon w-auto" style={{ height: '28px' }} />
                 WhatsApp
               </a>
               <button type="button" className="app-btn app-btn--secondary" onClick={handleCopy}>
