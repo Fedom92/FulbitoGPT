@@ -10,6 +10,18 @@
   fill: var(--pitch-green);
 }
 
+.field-half {
+  opacity: 0.14;
+}
+
+.field-half--blue {
+  fill: var(--player-blue);
+}
+
+.field-half--red {
+  fill: var(--player-red);
+}
+
 .field-line {
   stroke: var(--pitch-line);
   stroke-width: 0.3;

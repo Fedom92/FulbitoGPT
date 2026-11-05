@@ -14,7 +14,9 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.local
+*.log
 
 npm-debug.log*
 yarn-debug.log*
@@ -23,7 +25,7 @@ yarn-error.log*
 *.rar
 **/*.tsv
 
-# environment variables / secrets
+# environment variables
 .env
 .env.local
 .env.*.local
@@ -31,15 +33,25 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Firebase (config + local CLI state — not secrets themselves, but kept out per your preference)
+# Firebase (project config and local CLI state)
 .firebaserc
 firebase.json
 firebase-debug.log
 firebase-debug.*.log
 firestore.rules
+firestore.indexes.json
 .firebase/
 *firebase-adminsdk*.json
 serviceAccountKey.json
 
+# editor / local tooling
+.vscode/
+.idea/
+.obsidian/
+
+# AI assistant files and private working notes
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.mcp.json
 skill.md
-.claude

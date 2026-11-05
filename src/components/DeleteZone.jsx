@@ -1,15 +1,13 @@
 import './DeleteZone.css';
 
-export const DELETE_ZONE_HEIGHT_PX = 96;
-
-function DeleteZone({ visible }) {
+function DeleteZone({ visible, height, active }) {
   return (
     <div
-      className={`delete-zone${visible ? ' delete-zone--visible' : ''}`}
-      style={{ height: DELETE_ZONE_HEIGHT_PX }}
+      className={`delete-zone${visible ? ' delete-zone--visible' : ''}${active ? ' delete-zone--active' : ''}`}
+      style={height ? { height } : undefined}
       aria-hidden={!visible}
     >
-      ELIMINAR
+      🗑️ {active ? 'SOLTÁ PARA ELIMINAR' : 'ELIMINAR'}
     </div>
   );
 }

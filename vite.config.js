@@ -3,6 +3,15 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Bootstrap 5.3 still uses Sass features deprecated in Dart Sass 1.x.
+        quietDeps: true,
+        silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function'],
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

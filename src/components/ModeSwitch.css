@@ -1,0 +1,27 @@
+.mode-switch {
+  flex-shrink: 0;
+  display: flex;
+  gap: 4px;
+  margin: 0.5rem auto 0;
+  padding: 3px;
+  width: min(100% - 1rem, 320px);
+  border-radius: 999px;
+  background: #e9ecef;
+}
+
+.mode-switch__option {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.5rem;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.mode-switch__option--active {
+  background: #0f4c22;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

@@ -277,3 +277,108 @@
   border-color: var(--player-red);
   background: rgba(230, 35, 30, 0.06);
 }
+
+.team-picker__option--selected.team-picker__option--neutral {
+  border-color: var(--button-orange);
+  background: rgba(244, 128, 30, 0.06);
+}
+
+/* Input with a trailing square action button on the same row */
+
+.app-inline-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.app-inline-row > .app-input-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-icon-btn {
+  flex-shrink: 0;
+  width: 48px;
+  border: none;
+  border-radius: 12px;
+  background: var(--button-orange);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.app-icon-btn:hover:not(:disabled) {
+  background: #dd6d0f;
+}
+
+.app-icon-btn:disabled {
+  background: #f6cfae;
+}
+
+.app-icon-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Segmented control (single player / paste list) */
+
+.app-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: #f1f1f5;
+}
+
+.app-tabs__tab {
+  flex: 1;
+  border: none;
+  border-radius: 9px;
+  padding: 0.45rem 0.5rem;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #7a7a8c;
+}
+
+.app-tabs__tab--active {
+  background: #fff;
+  color: #1a1a2e;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.app-textarea.form-control {
+  border-radius: 12px;
+  border: 1.5px solid #e2e2ea;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.app-textarea.form-control:focus {
+  border-color: var(--button-orange);
+  box-shadow: 0 0 0 3px rgba(244, 128, 30, 0.15);
+}
+
+/* Preview of the names parsed from a pasted list */
+
+.app-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.app-chip {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: #f1f1f5;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #33333d;
+}
+
+.app-chip--excluded {
+  opacity: 0.4;
+  text-decoration: line-through;
+}

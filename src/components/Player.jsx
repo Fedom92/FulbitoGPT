@@ -7,15 +7,16 @@ function fontSizeFor(name) {
   return 10;
 }
 
-function Player({ player, fieldRef, onMove, onDelete, onRequestDelete, onLongPressStart, onLongPressEnd }) {
+function Player({ player, fieldRef, onMove, onDelete, onDoubleTap, onDragStart, onZoneHover, onDragEnd }) {
   const { phase, handlers } = usePlayerDrag({
     id: player.id,
     fieldRef,
     onMove,
     onDelete,
-    onRequestDelete,
-    onLongPressStart,
-    onLongPressEnd,
+    onDoubleTap,
+    onDragStart,
+    onZoneHover,
+    onDragEnd,
   });
 
   const isMoving = phase === 'dragging' || phase === 'armed';

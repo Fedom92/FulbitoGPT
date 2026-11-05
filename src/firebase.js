@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
-import { getFirestore } from 'firebase/firestore';
 
+// Only the core app lives here. Firestore and Analytics are imported on demand
+// (see services/) so neither SDK lands in the initial bundle.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -13,5 +13,3 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-export const db = getFirestore(app);

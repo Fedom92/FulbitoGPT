@@ -1,0 +1,15 @@
+// Only the Bootstrap pieces the app actually uses: modals, buttons, text
+// inputs and the spinner. Utility classes are hand-written in index.css.
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/forms/form-control";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/spinners";

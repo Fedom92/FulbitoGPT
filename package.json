@@ -1,6 +1,7 @@
 {
   "name": "fulbitoGPT",
   "private": true,
+  "license": "UNLICENSED",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.0",
+    "sass": "^1.107.1",
     "sharp": "^0.35.3",
     "vite": "^6.0.0",
     "vite-plugin-pwa": "^0.21.0"

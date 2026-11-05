@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 import { buildWhatsAppLink, copyToClipboard, shareFormation } from '../utils/share.js';
+import { track } from '../services/analytics.js';
 import logo_wsp from '../assets/whatsapp.webp';
 import './AppModal.css';
 
@@ -12,10 +13,11 @@ function SaveShareModal({ show, onClose, status, link, error, onRetry }) {
     await copyToClipboard(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    track('formation_shared', { method: 'copy' });
   };
 
   const handleShare = async () => {
-    await shareFormation(link);
+    if (await shareFormation(link)) track('formation_shared', { method: 'native' });
   };
 
   return (
@@ -64,6 +66,7 @@ function SaveShareModal({ show, onClose, status, link, error, onRetry }) {
                 href={buildWhatsAppLink(link)}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => track('formation_shared', { method: 'whatsapp' })}
                 className="app-btn d-flex align-items-center justify-content-center gap-2"
                 style={{ background: '#25D366', color: '#fff', textAlign: 'center', textDecoration: 'none' }}
               >

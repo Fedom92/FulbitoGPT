@@ -1,7 +1,7 @@
 import './SoccerField.css';
 
 // Real pitch proportions in meters (68 x 105), vertical orientation.
-function SoccerField() {
+function SoccerField({ showHalves = false }) {
   return (
     <svg
       className="soccer-field"
@@ -10,6 +10,14 @@ function SoccerField() {
       aria-hidden="true"
     >
       <rect x="0" y="0" width="68" height="105" className="field-turf" />
+
+      {/* match mode: top half = blue, bottom half = red */}
+      {showHalves && (
+        <>
+          <rect x="0" y="0" width="68" height="52.5" className="field-half field-half--blue" />
+          <rect x="0" y="52.5" width="68" height="52.5" className="field-half field-half--red" />
+        </>
+      )}
 
       {/* touchlines */}
       <rect x="0" y="0" width="68" height="105" className="field-line" fill="none" />

@@ -14,6 +14,8 @@ const PUBLIC_DIR = join(ROOT, 'public');
 const ICON_SOURCE = join(ASSETS_DIR, 'logo_simple.webp'); // icon-only mark, no wordmark
 const SOCIAL_SOURCE = join(ASSETS_DIR, 'logo.webp'); // full lockup with wordmark
 const BACKGROUND = { r: 0x0b, g: 0x27, b: 0x22 }; // sampled from the mark's own background
+// Palette quantization keeps the artwork visually identical at ~1/3–1/5 of the size.
+const PNG_OPTIONS = { palette: true, quality: 90, compressionLevel: 9, effort: 10 };
 
 mkdirSync(join(PUBLIC_DIR, 'icons'), { recursive: true });
 
@@ -21,7 +23,7 @@ async function writeSquareIcon(destName, size) {
   const dest = join(PUBLIC_DIR, 'icons', destName);
   await sharp(ICON_SOURCE)
     .resize(size, size, { fit: 'cover', kernel: sharp.kernel.lanczos3 })
-    .png({ compressionLevel: 9 })
+    .png(PNG_OPTIONS)
     .toFile(dest);
   console.log(`wrote ${dest} (${size}x${size})`);
 }
@@ -36,7 +38,7 @@ async function writeMaskableIcon(destName, size) {
     create: { width: size, height: size, channels: 3, background: BACKGROUND },
   })
     .composite([{ input: inner, gravity: 'centre' }])
-    .png({ compressionLevel: 9 })
+    .png(PNG_OPTIONS)
     .toFile(dest);
   console.log(`wrote ${dest} (${size}x${size}, maskable safe zone)`);
 }
@@ -47,7 +49,7 @@ async function writeSocialPreview() {
   const size = Math.min(meta.width, 1200); // never upscale past the source
   await sharp(SOCIAL_SOURCE)
     .resize(size, size, { kernel: sharp.kernel.lanczos3 })
-    .png({ compressionLevel: 9 })
+    .png(PNG_OPTIONS)
     .toFile(dest);
   console.log(`wrote ${dest} (${size}x${size})`);
 }

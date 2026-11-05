@@ -1,23 +1,33 @@
 import { useRef, useState } from 'react';
 import { clamp } from '../utils/clamp.js';
-import { DELETE_ZONE_HEIGHT_PX } from '../components/DeleteZone.jsx';
 
 const LONG_PRESS_MS = 500;
 const MOVE_THRESHOLD_PX = 8;
-const DOUBLE_CLICK_MS = 400;
+const DOUBLE_TAP_MS = 400;
+// The delete zone covers the space between the bottom of the pitch and the
+// bottom of the screen, but never less than this, so it stays easy to hit.
+const MIN_DELETE_ZONE_PX = 48;
 
-// Touch: long-press arms delete mode (shows the ELIMINAR strip), then drop the
-// player on it to delete immediately — real fingers rarely stay still enough
-// for a reliable double-tap, so touch never uses the double-click path.
-// Mouse/pen: double-click asks for confirmation instead (onRequestDelete).
-export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onRequestDelete, onLongPressStart, onLongPressEnd }) {
+export function deleteZoneTop(fieldRect) {
+  return Math.min(fieldRect.bottom, window.innerHeight - MIN_DELETE_ZONE_PX);
+}
+
+// Gestures on a player (mouse, touch and pen alike):
+// - drag: moves it; while dragging, the ELIMINAR zone shows up under the pitch
+//   and dropping the player there deletes it.
+// - long-press (touch): highlights the player and shows the zone right away,
+//   before moving.
+// - double click / double tap: asks to rename it (onDoubleTap).
+export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onDoubleTap, onDragStart, onZoneHover, onDragEnd }) {
   const [phase, setPhase] = useState('idle'); // idle | dragging | armed
   const phaseRef = useRef('idle');
   const pointerTypeRef = useRef('mouse');
   const timerRef = useRef(null);
   const startRef = useRef({ x: 0, y: 0 });
   const rectRef = useRef(null);
-  const lastClickRef = useRef(0);
+  const zoneTopRef = useRef(Infinity);
+  const overZoneRef = useRef(false);
+  const lastTapRef = useRef(0);
 
   const setPhaseBoth = (next) => {
     phaseRef.current = next;
@@ -40,6 +50,19 @@ export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onRequestDelete,
     };
   };
 
+  const startMoving = (nextPhase) => {
+    setPhaseBoth(nextPhase);
+    onDragStart?.(window.innerHeight - zoneTopRef.current);
+  };
+
+  const updateZoneHover = (clientY) => {
+    const over = clientY >= zoneTopRef.current;
+    if (over !== overZoneRef.current) {
+      overZoneRef.current = over;
+      onZoneHover?.(over);
+    }
+  };
+
   const handlePointerDown = (event) => {
     event.preventDefault();
     try {
@@ -50,13 +73,14 @@ export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onRequestDelete,
     pointerTypeRef.current = event.pointerType || 'mouse';
     startRef.current = { x: event.clientX, y: event.clientY };
     rectRef.current = fieldRef.current?.getBoundingClientRect() ?? null;
+    zoneTopRef.current = rectRef.current ? deleteZoneTop(rectRef.current) : Infinity;
+    overZoneRef.current = false;
     setPhaseBoth('idle');
 
     clearTimer();
     if (pointerTypeRef.current === 'touch') {
       timerRef.current = setTimeout(() => {
-        setPhaseBoth('armed');
-        onLongPressStart?.(id);
+        startMoving('armed');
         navigator.vibrate?.(30);
       }, LONG_PRESS_MS);
     }
@@ -68,42 +92,37 @@ export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onRequestDelete,
     if (phaseRef.current === 'idle') {
       const dx = event.clientX - startRef.current.x;
       const dy = event.clientY - startRef.current.y;
-      if (Math.hypot(dx, dy) > MOVE_THRESHOLD_PX) {
-        clearTimer();
-        setPhaseBoth('dragging');
-      } else {
-        return;
-      }
+      if (Math.hypot(dx, dy) <= MOVE_THRESHOLD_PX) return;
+      clearTimer();
+      startMoving('dragging');
     }
 
+    updateZoneHover(event.clientY);
     const pos = computePercent(event.clientX, event.clientY);
     if (pos) onMove(id, pos.x, pos.y);
   };
 
-  const finishGesture = (event) => {
+  const finish = (event, cancelled) => {
     clearTimer();
     const finishedPhase = phaseRef.current;
 
-    if (finishedPhase === 'armed') {
-      const inDeleteZone = event.clientY >= window.innerHeight - DELETE_ZONE_HEIGHT_PX;
-      if (inDeleteZone) {
+    if (finishedPhase === 'dragging' || finishedPhase === 'armed') {
+      if (!cancelled && event.clientY >= zoneTopRef.current) {
         onDelete?.(id);
-      } else {
-        const pos = computePercent(event.clientX, event.clientY);
-        if (pos) onMove(id, pos.x, pos.y);
       }
-      onLongPressEnd?.();
-    } else if (finishedPhase === 'idle' && pointerTypeRef.current !== 'touch') {
-      // A plain click (no movement) on mouse/pen: check for double-click.
+      onDragEnd?.();
+    } else if (!cancelled) {
+      // A tap/click without movement: two in a row ask to rename.
       const now = Date.now();
-      if (now - lastClickRef.current < DOUBLE_CLICK_MS) {
-        lastClickRef.current = 0;
-        onRequestDelete?.(id);
+      if (now - lastTapRef.current < DOUBLE_TAP_MS) {
+        lastTapRef.current = 0;
+        onDoubleTap?.(id);
       } else {
-        lastClickRef.current = now;
+        lastTapRef.current = now;
       }
     }
 
+    overZoneRef.current = false;
     setPhaseBoth('idle');
     rectRef.current = null;
   };
@@ -113,8 +132,8 @@ export function usePlayerDrag({ id, fieldRef, onMove, onDelete, onRequestDelete,
     handlers: {
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
-      onPointerUp: finishGesture,
-      onPointerCancel: finishGesture,
+      onPointerUp: (event) => finish(event, false),
+      onPointerCancel: (event) => finish(event, true),
     },
   };
 }

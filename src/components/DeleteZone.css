@@ -3,20 +3,27 @@
   left: 0;
   right: 0;
   bottom: 0;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(211, 47, 47, 0.85);
+  gap: 0.4rem;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(211, 47, 47, 0.55);
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.1em;
-  font-size: 1.1rem;
+  font-size: 1rem;
   z-index: 40;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 150ms ease;
+  transition: opacity 150ms ease, background-color 150ms ease;
 }
 
 .delete-zone--visible {
   opacity: 1;
+}
+
+.delete-zone--active {
+  background: rgba(211, 47, 47, 0.92);
 }
